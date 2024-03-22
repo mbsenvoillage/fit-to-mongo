@@ -1,0 +1,3 @@
+interface ConversionMap {}
+
+type FitMessageTypeKeys = "";
