@@ -154,8 +154,12 @@ describe("slimDownGarminSdkProfile", () => {
     console.error(err);
   });
 
-  it("EDGE: should return an empty result and an error if result is not of the right format", () => {
-    const { result, err } = slimDownGarminSdkProfile(undefined);
+  it("EDGE: should return an empty result and an error if input is not of the right format", () => {
+    const { result, err } = slimDownGarminSdkProfile({
+      messages: {
+        0: { messagesKey: 3, fields: { 0: { name: [], type: 2 } } },
+      },
+    });
     expect(result).toEqual({});
     expect(err).toBeDefined();
     console.error(err);

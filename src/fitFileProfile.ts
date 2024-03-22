@@ -1,62 +1,70 @@
+import Joi from "joi";
 import { handleError } from "./errors.js";
 import { IResult } from "./types/result.types.js";
 
 type FitProfile = Record<string, Record<string, string>>;
 
-/**
- * Extracts all messagesKey and corresponding fields from Garmin sdk Fit Profile object.
- * The Profile object gives the shape of a decoded Fit file
- * @param {Record<any, any>} unformattedFitProfile - The raw Profile object, untyped.
- */
+// Schema for each field within a message
+const fieldSchema = Joi.object({
+  name: Joi.string().required(),
+  type: Joi.string().required(),
+}).unknown(true);
+
+const fieldsSchema = Joi.object().pattern(Joi.number(), fieldSchema);
+
+// Schema for each message within the profile
+const messageSchema = Joi.object({
+  messagesKey: Joi.string().required(),
+  fields: fieldsSchema,
+}).unknown(true);
+
+// Schema for the messages object within the profile, which uses numeric keys
+const messagesSchema = Joi.object().pattern(Joi.number(), messageSchema);
+
+// Schema for the entire profile object
+const profileSchema = Joi.object({
+  messages: messagesSchema,
+}).unknown(true);
+
 export function slimDownGarminSdkProfile(
-  unformattedFitProfile: Record<any, any>
+  unformattedFitProfile: any
 ): IResult<FitProfile> {
   let res: IResult<FitProfile> = { result: {} };
-  const p = {};
+
+  // Validate the entire structure upfront
+  const { error } = profileSchema.validate(unformattedFitProfile, {
+    allowUnknown: true,
+    abortEarly: false,
+  });
+
+  if (error) {
+    return {
+      err: handleError(
+        new Error(`Validation error: ${error.message}`),
+        slimDownGarminSdkProfile
+      ),
+      result: {},
+    };
+  }
 
   try {
     const messages = unformattedFitProfile.messages;
 
-    // messages contains numbered keys
     for (let key in messages) {
-      // the messagesKey property is what we'll be looking for in the decoded fit file
-      const messagesKey = messages[key].messagesKey;
+      const message = messages[key];
+      const messagesKey = message.messagesKey;
+      res.result[messagesKey] = {};
 
-      if (typeof messagesKey != "string") {
-        throw new Error("messagesKey is not of type string");
-      }
-
-      p[messagesKey] = {};
-
-      // the fields property contains the name and type of the fields included in the object
-      // of name [messagesKey]
-      const messagesKeyFields = messages[key].fields;
-
-      if (
-        typeof messagesKeyFields != "object" ||
-        !("fields" in messages[key])
-      ) {
-        throw new Error("the property fields is not an object or is absent ");
-      }
-
-      for (let subkey in messages[key].fields) {
-        if (
-          !("name" in messages[key].fields[subkey]) ||
-          typeof messages[key].fields[subkey].name != "string"
-        ) {
-          throw new Error(
-            "Property name in fields object does not exist or is not a string"
-          );
-        }
-        p[messagesKey][messages[key].fields[subkey].name] =
-          messages[key].fields[subkey].type;
+      for (let fieldKey in message.fields) {
+        const field = message.fields[fieldKey];
+        res.result[messagesKey][field.name] = field.type;
       }
     }
   } catch (e: any) {
+    // Catch any unexpected errors during transformation
     res.err = handleError(e, slimDownGarminSdkProfile);
     return res;
   }
 
-  res.result = p;
   return res;
 }
