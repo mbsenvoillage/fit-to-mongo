@@ -19,6 +19,7 @@
     "typescript": "^5.4.3"
   },
   "dependencies": {
-    "@garmin/fitsdk": "^21.133.0"
+    "@garmin/fitsdk": "^21.133.0",
+    "joi": "^17.12.2"
   }
 }

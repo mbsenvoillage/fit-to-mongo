@@ -1,8 +1,8 @@
 // profile.test.ts
-import { getProfileData } from "./fitFileProfile.js";
+import { slimDownGarminSdkProfile } from "./fitFileProfile.js";
 
-describe("getProfileData", () => {
-  it("should extract keys and fields with types from Profile", () => {
+describe("slimDownGarminSdkProfile", () => {
+  it("MAIN: should extract keys and fields with types from Profile", () => {
     const profile = {
       messages: {
         0: {
@@ -143,6 +143,21 @@ describe("getProfileData", () => {
       },
     };
 
-    expect(getProfileData(profile)).toEqual(expectedOutput);
+    const { result } = slimDownGarminSdkProfile(profile);
+    expect(result).toEqual(expectedOutput);
+  });
+
+  it("EDGE: should return an empty result and an error if undefined is passed", () => {
+    const { result, err } = slimDownGarminSdkProfile(undefined);
+    expect(result).toEqual({});
+    expect(err).toBeDefined();
+    console.error(err);
+  });
+
+  it("EDGE: should return an empty result and an error if result is not of the right format", () => {
+    const { result, err } = slimDownGarminSdkProfile(undefined);
+    expect(result).toEqual({});
+    expect(err).toBeDefined();
+    console.error(err);
   });
 });
