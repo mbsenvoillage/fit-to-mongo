@@ -39,6 +39,8 @@ const js = JSON.stringify(j);
 
 fs.writeFileSync("./wahoo.json", js);
 
+console.log(Profile);
+
 /*
 sessionMesgs = activity summary
 */
