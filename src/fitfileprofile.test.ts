@@ -147,19 +147,31 @@ describe("slimDownGarminSdkProfile", () => {
     expect(result).toEqual(expectedOutput);
   });
 
-  it("EDGE: should return an empty result and an error if undefined is passed", () => {
+  it("MAIN: should return an empty result and an error if undefined is passed", () => {
     const { result, err } = slimDownGarminSdkProfile(undefined);
     expect(result).toEqual({});
     expect(err).toBeDefined();
     console.error(err);
   });
 
-  it("EDGE: should return an empty result and an error if input is not of the right format", () => {
+  it("MAIN: should return an empty result and an error if input is not of the right format", () => {
     const { result, err } = slimDownGarminSdkProfile({
       messages: {
         0: { messagesKey: 3, fields: { 0: { name: [], type: 2 } } },
       },
     });
+    expect(result).toEqual({});
+    expect(err).toBeDefined();
+    console.error(err);
+  });
+  it("EDGE: should return an empty result and an error if input is a number", () => {
+    const { result, err } = slimDownGarminSdkProfile(2);
+    expect(result).toEqual({});
+    expect(err).toBeDefined();
+    console.error(err);
+  });
+  it("EDGE: should return an empty result and an error if input is a string", () => {
+    const { result, err } = slimDownGarminSdkProfile("2");
     expect(result).toEqual({});
     expect(err).toBeDefined();
     console.error(err);
