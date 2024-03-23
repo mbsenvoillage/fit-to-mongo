@@ -1,7 +1,7 @@
 // profile.test.ts
-import { slimDownGarminSdkProfile } from "./fitFileProfile.js";
+import { transformFitProfileStructure } from "./fitFileProfile.js";
 
-describe("slimDownGarminSdkProfile", () => {
+describe("transformFitProfileStructure", () => {
   it("MAIN: should extract keys and fields with types from Profile", () => {
     const profile = {
       messages: {
@@ -143,19 +143,19 @@ describe("slimDownGarminSdkProfile", () => {
       },
     };
 
-    const { result } = slimDownGarminSdkProfile(profile);
+    const { result } = transformFitProfileStructure(profile);
     expect(result).toEqual(expectedOutput);
   });
 
   it("MAIN: should return an empty result and an error if undefined is passed", () => {
-    const { result, err } = slimDownGarminSdkProfile(undefined);
+    const { result, err } = transformFitProfileStructure(undefined);
     expect(result).toEqual({});
     expect(err).toBeDefined();
     console.error(err);
   });
 
   it("MAIN: should return an empty result and an error if input is not of the right format", () => {
-    const { result, err } = slimDownGarminSdkProfile({
+    const { result, err } = transformFitProfileStructure({
       messages: {
         0: { messagesKey: 3, fields: { 0: { name: [], type: 2 } } },
       },
@@ -165,13 +165,13 @@ describe("slimDownGarminSdkProfile", () => {
     console.error(err);
   });
   it("EDGE: should return an empty result and an error if input is a number", () => {
-    const { result, err } = slimDownGarminSdkProfile(2);
+    const { result, err } = transformFitProfileStructure(2);
     expect(result).toEqual({});
     expect(err).toBeDefined();
     console.error(err);
   });
   it("EDGE: should return an empty result and an error if input is a string", () => {
-    const { result, err } = slimDownGarminSdkProfile("2");
+    const { result, err } = transformFitProfileStructure("2");
     expect(result).toEqual({});
     expect(err).toBeDefined();
     console.error(err);

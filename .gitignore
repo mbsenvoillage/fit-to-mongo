@@ -2,3 +2,4 @@ features.md
 node_modules
 dist
 roadmap.md
+src/playground.ts
