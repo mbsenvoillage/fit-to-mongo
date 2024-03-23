@@ -37,12 +37,14 @@ const embeddedDocumentConfigSchema = Joi.array().items({
   fieldMappings: fieldsMappingSchema,
 });
 
-export const fitConversionMapSchema = Joi.object().pattern(
-  Joi.string(),
-  Joi.object({
-    collectionName: Joi.string(),
-    fields: fieldsMappingSchema,
-    documentReferences: documentReferenceSchema,
-    embeddedDocuments: embeddedDocumentConfigSchema,
-  })
-);
+export const fitConversionMapSchema = Joi.object()
+  .pattern(
+    Joi.string(),
+    Joi.object({
+      collectionName: Joi.string(),
+      fields: fieldsMappingSchema,
+      documentReferences: documentReferenceSchema,
+      embeddedDocuments: embeddedDocumentConfigSchema,
+    })
+  )
+  .min(1);

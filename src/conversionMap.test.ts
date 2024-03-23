@@ -2,8 +2,8 @@ import { validateConversionMap } from "./conversionMap.js";
 import { expect, describe, it } from "vitest";
 
 describe("validateConversionMap", () => {
-  const conversionMapWithErroneousFields = {
-    recordMsgs: {
+  const conversionMap = {
+    recordMesgs: {
       collectionName: "activityRecords",
       fields: {
         positionLat: "latitude",
@@ -19,40 +19,102 @@ describe("validateConversionMap", () => {
       ],
       embeddedDocuments: [
         {
-          messageType: "messageType1",
+          messageType: "recordMesgs",
           embedAs: "embeddedFieldName1",
           fieldMappings: {
-            fitField1: "mongoField1",
-            fitField2: "mongoField2",
+            positionLat: "mongoField1",
+            positionLong: "mongoField2",
           },
         },
         {
-          messageType: "messageType2",
+          messageType: "recordMesgs",
           embedAs: "embeddedFieldName2",
           fieldMappings: {
-            fitFieldA: "mongoFieldA",
-            fitFieldB: "mongoFieldB",
+            positionLong: "mongoFieldA",
+            heartRate: "mongoFieldB",
           },
         },
       ],
     },
   };
 
-  it("MAIN: should return true if the passed conversion map has the right format", () => {
-    const { result } = validateConversionMap(conversionMapWithErroneousFields);
+  it("should return true if the passed conversion map has the right format", () => {
+    const { result, err } = validateConversionMap(conversionMap);
+
+    console.log(err);
 
     expect(result).toBe(true);
   });
 
-  it("MAIN: should return false if the passed conversion map has the wrong format", () => {
+  it("should return false if the passed conversion map has the wrong format", () => {
     const { result } = validateConversionMap({});
 
     expect(result).toBe(false);
   });
 
-  it("MAIN: should return true if the passed conversion map contains known messageTypes", () => {
-    const { result } = validateConversionMap(conversionMapWithErroneousFields);
+  it("should return true if the passed conversion map contains known messageTypes", () => {
+    const { result } = validateConversionMap(conversionMap);
 
     expect(result).toBe(true);
+  });
+
+  it("should return false if the passed conversion map contains unknown messageTypes", () => {
+    const { result, err } = validateConversionMap({
+      recd: { collectionName: "hey", fields: {} },
+    });
+
+    console.log(err);
+    expect(result).toBe(false);
+  });
+
+  it("should return false if the passed conversion map contains unknown fieldnames", () => {
+    const erroneousFieldNames = {
+      zerzer: "latitude",
+      dfdf: "longitude",
+      rér: "heart_rate",
+    };
+
+    const erroneousMap = { ...conversionMap };
+
+    erroneousMap.recordMesgs.fields = erroneousFieldNames as any;
+    const { result, err } = validateConversionMap(erroneousMap);
+
+    console.log(err);
+    expect(result).toBe(false);
+  });
+
+  it("should return false if the passed conversion map contains unknown messageTypes in embeddedDocuments", () => {
+    const erroneousEmbeddedDocument = {
+      ...conversionMap.recordMesgs.embeddedDocuments[0],
+    };
+    erroneousEmbeddedDocument.messageType = "eruzeriuy";
+
+    const { result, err } = validateConversionMap({
+      recordMesgs: {
+        collectionName: "recordMesgs",
+        fields: {},
+        embeddedDocuments: [erroneousEmbeddedDocument],
+      },
+    });
+
+    console.log(err);
+    expect(result).toBe(false);
+  });
+
+  it("should return false if the passed conversion map contains unknown fields in embeddedDocuments", () => {
+    const embeddedDocuments = [...conversionMap.recordMesgs.embeddedDocuments];
+
+    embeddedDocuments[0].fieldMappings = { pistt: "eruherh" } as any;
+
+    const { result, err } = validateConversionMap({
+      recordMesgs: {
+        collectionName: "recordMesgs",
+        fields: {},
+        embeddedDocuments,
+      },
+    });
+
+    console.log(err);
+    expect(result).toBe(false);
   });
 });

@@ -1,6 +1,7 @@
 import Joi from "joi";
 import { handleError } from "./errors.js";
 import { IResult } from "./types/result.types.js";
+import { Profile } from "@garmin/fitsdk";
 
 type FitProfile = Record<string, Record<string, string>>;
 
@@ -83,3 +84,6 @@ export function transformFitProfileStructure(
 
   return res;
 }
+
+export const { result: transformedFitProfileStructure } =
+  transformFitProfileStructure(Profile);
