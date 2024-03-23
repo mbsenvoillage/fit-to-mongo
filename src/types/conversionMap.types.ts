@@ -1,3 +1,5 @@
+import Joi from "joi";
+
 interface FieldsMapping {
   [fitFieldName: string]: string;
 }
@@ -22,3 +24,25 @@ export interface FitConversionMap {
     embeddedDocuments?: Array<EmbeddedDocumentConfig>;
   };
 }
+
+const fieldsMappingSchema = Joi.object().pattern(Joi.string(), Joi.string());
+const documentReferenceSchema = Joi.array().items({
+  localField: Joi.string().required(),
+  foreignCollection: Joi.string().required(),
+  foreignField: Joi.string().required(),
+});
+const embeddedDocumentConfigSchema = Joi.array().items({
+  messageType: Joi.string().required(),
+  embedAs: Joi.string().required(),
+  fieldMappings: fieldsMappingSchema,
+});
+
+export const fitConversionMapSchema = Joi.object().pattern(
+  Joi.string(),
+  Joi.object({
+    collectionName: Joi.string(),
+    fields: fieldsMappingSchema,
+    documentReferences: documentReferenceSchema,
+    embeddedDocuments: embeddedDocumentConfigSchema,
+  })
+);
