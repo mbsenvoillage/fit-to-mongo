@@ -3,3 +3,6 @@ node_modules
 dist
 roadmap.md
 src/playground.ts
+src/format.json
+src/insertionalgo.md
+src/recordMsgs.ts
