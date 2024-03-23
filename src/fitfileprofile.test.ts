@@ -1,5 +1,6 @@
 // profile.test.ts
 import { transformFitProfileStructure } from "./fitFileProfile.js";
+import { expect, describe, it } from "vitest";
 
 describe("transformFitProfileStructure", () => {
   it("MAIN: should extract keys and fields with types from Profile", () => {

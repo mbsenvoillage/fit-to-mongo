@@ -1,4 +1,5 @@
 import { validateConversionMap } from "./conversionMap.js";
+import { expect, describe, it } from "vitest";
 
 describe("validateConversionMap", () => {
   const conversionMapWithErroneousFields = {
@@ -38,6 +39,18 @@ describe("validateConversionMap", () => {
   };
 
   it("MAIN: should return true if the passed conversion map has the right format", () => {
+    const { result } = validateConversionMap(conversionMapWithErroneousFields);
+
+    expect(result).toBe(true);
+  });
+
+  it("MAIN: should return false if the passed conversion map has the wrong format", () => {
+    const { result } = validateConversionMap({});
+
+    expect(result).toBe(false);
+  });
+
+  it("MAIN: should return true if the passed conversion map contains known messageTypes", () => {
     const { result } = validateConversionMap(conversionMapWithErroneousFields);
 
     expect(result).toBe(true);
