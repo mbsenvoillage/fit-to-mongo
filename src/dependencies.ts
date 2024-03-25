@@ -1,3 +1,4 @@
+import { handleError } from "./errors.js";
 import { FitConversionMap } from "./types/conversionMap.types.js";
 import { IResult } from "./types/result.types.js";
 
@@ -24,17 +25,24 @@ interface DependencyGraph {
 export function buildDependencyGraph(
   conversionMap: FitConversionMap
 ): IResult<DependencyGraph> {
+  let res: IResult<DependencyGraph> = { result: {} };
   const dependencyGraph: DependencyGraph = {};
 
-  for (let msgType in conversionMap) {
-    const collName = conversionMap[msgType].collectionName;
-    const docRefs = conversionMap[msgType].documentReferences;
+  try {
+    for (let msgType in conversionMap) {
+      const collName = conversionMap[msgType].collectionName;
+      const docRefs = conversionMap[msgType].documentReferences;
 
-    dependencyGraph[collName] = dependencyGraph[collName] || [];
-    for (let doc of docRefs) {
-      dependencyGraph[collName].push(doc.foreignCollection);
+      dependencyGraph[collName] = dependencyGraph[collName] || [];
+      for (let doc of docRefs) {
+        dependencyGraph[collName].push(doc.foreignCollection);
+      }
     }
+  } catch (e) {
+    res.err = handleError(e, buildDependencyGraph);
+    return res;
   }
+  res.result = dependencyGraph;
 
-  return { result: dependencyGraph };
+  return res;
 }
