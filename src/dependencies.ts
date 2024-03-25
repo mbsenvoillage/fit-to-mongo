@@ -46,3 +46,51 @@ export function buildDependencyGraph(
 
   return res;
 }
+
+/**
+ * Detects circular dependencies in a dependency graph.
+ * Utilizes depth-first search to explore the graph, marking nodes as visited and
+ * tracking the recursion stack. If a node is encountered that is already in the
+ * recursion stack, a cycle is detected.
+ *
+ * @param {DependencyGraph} graph - The dependency graph to be checked for cycles.
+ *        The graph is represented as a mapping from node identifiers to arrays of
+ *        identifiers representing the nodes' dependencies.
+ * @returns {boolean} Returns true if a circular dependency is detected, otherwise false.
+ */
+export function detectCircularDep(graph: DependencyGraph): boolean {
+  let visited: Set<string> = new Set(); // Tracks visited nodes
+  let recStack: Set<string> = new Set(); // Tracks nodes in the current recursion stack
+
+  const dfs = (node: string): boolean => {
+    if (recStack.has(node)) {
+      console.error("Detected a cycle involving node: ", node);
+      return true;
+    }
+
+    if (visited.has(node)) {
+      return false;
+    }
+
+    visited.add(node);
+    recStack.add(node);
+
+    // Explore all neighbors
+    for (let neighbor of graph[node] || []) {
+      if (dfs(neighbor)) {
+        return true;
+      }
+    }
+
+    recStack.delete(node);
+    return false;
+  };
+
+  for (let node in graph) {
+    if (dfs(node)) {
+      return true;
+    }
+  }
+
+  return false;
+}
