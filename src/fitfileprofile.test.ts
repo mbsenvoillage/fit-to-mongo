@@ -1,4 +1,3 @@
-// profile.test.ts
 import { transformFitProfileStructure } from "./fitFileProfile.js";
 import { expect, describe, it } from "vitest";
 

@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-interface FieldsMapping {
+export interface FieldsMapping {
   [fitFieldName: string]: string;
 }
 
