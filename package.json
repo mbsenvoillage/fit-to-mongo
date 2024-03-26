@@ -3,16 +3,19 @@
   "type": "module",
   "version": "1.0.0",
   "description": "converts fit file into mongodb schema",
-  "main": "index.js",
   "scripts": {
-    "tsc": "tsc",
-    "test": "vitest"
+    "build": "tsc",
+    "test": "vitest",
+    "start": "tsc && node dist/playground.js",
+    "dev": "nodemon"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@jest/globals": "^29.7.0",
     "@types/node": "^20.11.30",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.3",
     "vitest": "^1.4.0"
   },
