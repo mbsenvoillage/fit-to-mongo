@@ -2,7 +2,7 @@ import { expect, describe, it } from "vitest";
 import { buildDocFromFieldsMapping } from "./insertable.js";
 
 describe("buildDocFromFieldsMapping", () => {
-  it("should build", () => {
+  it("should build an insertable document if valid params are passed", () => {
     const messagetypeEntry = {
       timestamp: "2024-02-29T15:29:52.000Z",
       positionLat: 520602642,
@@ -40,5 +40,13 @@ describe("buildDocFromFieldsMapping", () => {
     );
 
     expect(result).toEqual(expectedResult);
+    expect(err).toBeUndefined();
+  });
+
+  it("should return an empty result and an error if invalid params are passed", () => {
+    const { result, err } = buildDocFromFieldsMapping(3 as any, undefined);
+
+    expect(err).toBeDefined();
+    expect(result).toEqual({});
   });
 });
