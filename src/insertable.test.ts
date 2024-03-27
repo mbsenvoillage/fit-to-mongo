@@ -1,7 +1,7 @@
 import { expect, describe, it } from "vitest";
-import { buildDocFromFieldsMapping } from "./insertable.js";
+import { mapFitFields } from "./insertable.js";
 
-describe("buildDocFromFieldsMapping", () => {
+describe("mapFitFields", () => {
   it("should build an insertable document if valid params are passed", () => {
     const messagetypeEntry = {
       timestamp: "2024-02-29T15:29:52.000Z",
@@ -34,17 +34,14 @@ describe("buildDocFromFieldsMapping", () => {
       power: 73,
     };
 
-    const { result, err } = buildDocFromFieldsMapping(
-      fieldsMapping,
-      messagetypeEntry
-    );
+    const { result, err } = mapFitFields(fieldsMapping, messagetypeEntry);
 
     expect(result).toEqual(expectedResult);
     expect(err).toBeUndefined();
   });
 
   it("should return an empty result and an error if invalid params are passed", () => {
-    const { result, err } = buildDocFromFieldsMapping(3 as any, undefined);
+    const { result, err } = mapFitFields(3 as any, undefined);
 
     expect(err).toBeDefined();
     expect(result).toEqual({});
