@@ -33,11 +33,29 @@ export function mapFitFields(
   return { result };
 }
 
+const t = {
+  messageType: "messageType1",
+  embedAs: "embeddedFieldName1",
+  fieldMappings: {
+    fitField1: "mongoField1",
+    fitField2: "mongoField2",
+  },
+};
+
 export function embedDocument(
   embeddedDocConfig: EmbeddedDocumentConfig,
-  fitFileMessageTypeElement: { [field: string]: any }
+  decodedFitFile: { [field: string]: Array<Record<string, any>> }
 ): IResult<Record<string, any>> {
-  return { result: {} };
+  let result = {};
+
+  for (let el of decodedFitFile[embeddedDocConfig.messageType]) {
+    const { result: res } = mapFitFields(embeddedDocConfig.fieldMappings, el);
+
+    embeddedDocConfig.embedAs in result
+      ? result[embeddedDocConfig.embedAs].push(res)
+      : (result[embeddedDocConfig.embedAs] = [res]);
+  }
+  return { result };
 }
 
 export function referenceDocument(

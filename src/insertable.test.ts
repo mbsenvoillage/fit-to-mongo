@@ -1,5 +1,5 @@
 import { expect, describe, it } from "vitest";
-import { mapFitFields } from "./insertable.js";
+import { embedDocument, mapFitFields } from "./insertable.js";
 
 describe("mapFitFields", () => {
   it("should build an insertable document if valid params are passed", () => {
@@ -45,5 +45,47 @@ describe("mapFitFields", () => {
 
     expect(err).toBeDefined();
     expect(result).toEqual({});
+  });
+});
+
+describe("embedDocument", () => {
+  it("should build an insertable document if valid params are passed", () => {
+    const config = {
+      messageType: "activityMesgs",
+      embedAs: "msgs",
+      fieldMappings: {
+        numSessions: "n",
+        eventType: "s",
+      },
+    };
+
+    const decodedFitFile = {
+      activityMesgs: [
+        {
+          timestamp: "2024-02-29T16:03:53.000Z",
+          localTimestamp: 1078160633,
+          numSessions: 1,
+          type: "manual",
+          event: "activity",
+          eventType: "stop",
+          totalTimerTime: 2043,
+        },
+      ],
+    };
+
+    const expectedResult = {
+      msgs: [
+        {
+          n: 1,
+          s: "stop",
+        },
+      ],
+    };
+
+    const { result, err } = embedDocument(config, decodedFitFile);
+
+    console.log(JSON.stringify(result));
+
+    expect(result).toEqual(expectedResult);
   });
 });
