@@ -33,28 +33,33 @@ export function mapFitFields(
   return { result };
 }
 
-const t = {
-  messageType: "messageType1",
-  embedAs: "embeddedFieldName1",
-  fieldMappings: {
-    fitField1: "mongoField1",
-    fitField2: "mongoField2",
-  },
-};
-
 export function embedDocument(
   embeddedDocConfig: EmbeddedDocumentConfig,
   decodedFitFile: { [field: string]: Array<Record<string, any>> }
 ): IResult<Record<string, any>> {
   let result = {};
 
-  for (let el of decodedFitFile[embeddedDocConfig.messageType]) {
-    const { result: res } = mapFitFields(embeddedDocConfig.fieldMappings, el);
+  try {
+    if (decodedFitFile[embeddedDocConfig.messageType].length > 10) {
+      console.warn(
+        "The messageType you want to embed contains more than 10 elements. Consider using a reference rather than an embedded document."
+      );
+    }
 
-    embeddedDocConfig.embedAs in result
-      ? result[embeddedDocConfig.embedAs].push(res)
-      : (result[embeddedDocConfig.embedAs] = [res]);
+    for (let el of decodedFitFile[embeddedDocConfig.messageType]) {
+      const { result: res } = mapFitFields(embeddedDocConfig.fieldMappings, el);
+
+      embeddedDocConfig.embedAs in result
+        ? result[embeddedDocConfig.embedAs].push(res)
+        : (result[embeddedDocConfig.embedAs] = [res]);
+    }
+  } catch (e) {
+    return {
+      err: handleError(e, embedDocument),
+      result: {},
+    };
   }
+
   return { result };
 }
 

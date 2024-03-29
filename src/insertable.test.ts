@@ -1,4 +1,4 @@
-import { expect, describe, it } from "vitest";
+import { expect, describe, it, vi } from "vitest";
 import { embedDocument, mapFitFields } from "./insertable.js";
 
 describe("mapFitFields", () => {
@@ -84,8 +84,77 @@ describe("embedDocument", () => {
 
     const { result, err } = embedDocument(config, decodedFitFile);
 
-    console.log(JSON.stringify(result));
-
     expect(result).toEqual(expectedResult);
+  });
+
+  it("should return an empty result and an error if invalid params are passed", () => {
+    const { result, err } = embedDocument(undefined as any, undefined as any);
+
+    expect(result).toEqual({});
+    expect(err).toBeDefined();
+  });
+
+  it("should warn the user if the embedded document contains more than 10 elements", () => {
+    const config = {
+      messageType: "activityMesgs",
+      embedAs: "msgs",
+      fieldMappings: {
+        numSessions: "n",
+        eventType: "s",
+      },
+    };
+
+    const decodedFitFile = {
+      activityMesgs: [
+        {
+          numSessions: 1,
+          eventType: "stop",
+        },
+        {
+          numSessions: 1,
+          eventType: "stop",
+        },
+        {
+          numSessions: 1,
+          eventType: "stop",
+        },
+        {
+          numSessions: 1,
+          eventType: "stop",
+        },
+        {
+          numSessions: 1,
+          eventType: "stop",
+        },
+        {
+          numSessions: 1,
+          eventType: "stop",
+        },
+        {
+          numSessions: 1,
+          eventType: "stop",
+        },
+        {
+          numSessions: 1,
+          eventType: "stop",
+        },
+        {
+          numSessions: 1,
+          eventType: "stop",
+        },
+        {
+          numSessions: 1,
+          eventType: "stop",
+        },
+        {
+          numSessions: 1,
+          eventType: "stop",
+        },
+      ],
+    };
+    const warnSpy = vi.spyOn(global.console, "warn");
+
+    embedDocument(config, decodedFitFile);
+    expect(warnSpy).toHaveBeenCalledOnce();
   });
 });
